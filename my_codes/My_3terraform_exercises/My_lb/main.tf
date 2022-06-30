@@ -134,7 +134,7 @@ resource "azurerm_public_ip" "azpip1" {
   idle_timeout_in_minutes = 30
 
   tags = {
-    environment = "vm"
+    environment = "Test"
   }
 }
 resource "azurerm_network_interface" "networkint1" {
@@ -177,7 +177,7 @@ storage_image_reference {
     disable_password_authentication = false
   }
   tags = {
-    environment = "vir.machine"
+    environment = "Test"
   }
 
 }
@@ -206,7 +206,7 @@ resource "azurerm_public_ip" "azpip2" {
   idle_timeout_in_minutes = 30
 
   tags = {
-    environment = "vm2"
+    environment = "Test"
   }
 }
 resource "azurerm_network_interface" "networkint2" {
@@ -249,7 +249,7 @@ storage_image_reference {
     disable_password_authentication = false
   }
   tags = {
-    environment = "vir.machine2"
+    environment = "Test"
   }
 
 }
