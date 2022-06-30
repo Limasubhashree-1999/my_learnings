@@ -1,0 +1,10 @@
+variable "rg" {}
+variable "vnet2" {}
+variable "subnet2" {}
+variable "username" {}
+variable "password" {}
+variable "location" {}
+variable "vm2_name" {}
+variable "vm2_size" {}
+variable "vm2_pip" {}
+variable "vm2_nic" {}
