@@ -84,7 +84,7 @@ storage_image_reference {
     disable_password_authentication = false
   }
   tags = {
-    environment = "vir.machine2"
+    environment = "vir.machine"
   }
 
 }
