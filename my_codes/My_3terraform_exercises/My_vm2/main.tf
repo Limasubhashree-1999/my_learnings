@@ -17,16 +17,16 @@ data "azurerm_resource_group" "resource1" {
     name = var.rg
   
 }
-resource "azurerm_virtual_network" "vnet2" {
+resource "azurerm_virtual_network" "vnet1" {
     name = var.vnet2
     location = var.location
     resource_group_name = data.azurerm_resource_group.resource1.name
     address_space = [ "10.0.0.0/16" ]
 }
-resource "azurerm_subnet" "subnet2" {
+resource "azurerm_subnet" "subnet1" {
     name = var.subnet2
     resource_group_name = data.azurerm_resource_group.resource1.name
-    virtual_network_name = azurerm_virtual_network.vnet2.name
+    virtual_network_name = azurerm_virtual_network.vnet1.name
     address_prefixes = [ "10.0.2.0/24" ]
 }
 output "resource_group_id" {
