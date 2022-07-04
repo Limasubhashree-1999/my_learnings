@@ -17,15 +17,19 @@ data "azurerm_resource_group" "resource2" {
     name = var.rg4
 
 }
-data "azurerm_virtual_network" "vnet1" {
+resource "azurerm_virtual_network" "vnet1" {
     name = var.vnet4
     resource_group_name = data.azurerm_resource_group.resource2.name
+    location = data.azurerm_resource_group.resource2.location
+    address_space = var.node_address_space
 }
-data "azurerm_subnet" "subnet1" {
+resource"azurerm_subnet" "subnet1" {
     name = var.subnet4
     resource_group_name = data.azurerm_resource_group.resource2.name
-    virtual_network_name = data.azurerm_virtual_network.vnet1.name
+    virtual_network_name = azurerm_virtual_network.vnet1.name
+    address_prefixes = var.node_address_prefix
 }
+
 resource "azurerm_network_interface" "networkint2_nic" {
     count = var.node_count
     #name = "${var.resource_prefix}-NIC"
@@ -36,7 +40,7 @@ resource "azurerm_network_interface" "networkint2_nic" {
 
     ip_configuration {
         name = "internal"
-        subnet_id = data.azurerm_subnet.subnet1.id
+        subnet_id = azurerm_subnet.subnet1.id
         private_ip_address_allocation = "Dynamic"
         
     }
@@ -95,9 +99,4 @@ resource "azurerm_lb_backend_address_pool" "azbackendpool" {
 }
 
 
-resource "azurerm_network_interface_backend_address_pool_association" "azbackendaddpool" {
-  count = var.node_count
-  network_interface_id = "${element(azurerm_network_interface.networkint2_nic.*.id, count.index)}"
-  ip_configuration_name   = "internal"
-  backend_address_pool_id = azurerm_lb_backend_address_pool.azbackendpool.id
-}
+
