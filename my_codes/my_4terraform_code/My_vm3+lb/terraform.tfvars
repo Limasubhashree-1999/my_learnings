@@ -1,6 +1,6 @@
 username = "testadmin1"
 password = "password1234!"
-rg4 = "my_resource_group2"
+rg4 = "my_newresource_group_jenkins1"
 vnet4 = "my_vnet1"
 subnet4 = "my_subnet1"
 location = "East Asia"
