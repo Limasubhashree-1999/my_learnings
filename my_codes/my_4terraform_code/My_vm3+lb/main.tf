@@ -20,13 +20,13 @@ resource "azurerm_resource_group" "resource2" {
 }
 resource "azurerm_virtual_network" "vnet1" {
     name = var.vnet4
-    resource_group_name = data.azurerm_resource_group.resource2.name
-    location = data.azurerm_resource_group.resource2.location
+    resource_group_name = azurerm_resource_group.resource2.name
+    location = azurerm_resource_group.resource2.location
     address_space = var.node_address_space
 }
 resource"azurerm_subnet" "subnet1" {
     name = var.subnet4
-    resource_group_name = data.azurerm_resource_group.resource2.name
+    resource_group_name = azurerm_resource_group.resource2.name
     virtual_network_name = azurerm_virtual_network.vnet1.name
     address_prefixes = var.node_address_prefix
 }
@@ -35,8 +35,8 @@ resource "azurerm_network_interface" "networkint2_nic" {
     count = var.node_count
     #name = "${var.resource_prefix}-NIC"
     name = "${var.resource_prefix}-${format("%02d", count.index)}"
-    location = data.azurerm_resource_group.resource2.location
-    resource_group_name = data.azurerm_resource_group.resource2.name
+    location = azurerm_resource_group.resource2.location
+    resource_group_name = azurerm_resource_group.resource2.name
     
 
     ip_configuration {
@@ -52,8 +52,8 @@ resource "azurerm_virtual_machine" "vir_machine" {
     count = var.node_count
     name = "${var.resource_prefix}-${format("%02d", count.index)}"
     #name = "${var.resource_prefix}-VM"
-    location = data.azurerm_resource_group.resource2.location
-    resource_group_name = data.azurerm_resource_group.resource2.name
+    location = azurerm_resource_group.resource2.location
+    resource_group_name = azurerm_resource_group.resource2.name
     network_interface_ids = [element(azurerm_network_interface.networkint2_nic.*.id, count.index)]
     vm_size = "Standard_A1_v2"
     delete_os_disk_on_termination = true
@@ -87,8 +87,8 @@ resource "azurerm_virtual_machine" "vir_machine" {
 
 resource "azurerm_lb" "azlb2" {
   name                = "azlb2-lb"
-  location            = data.azurerm_resource_group.resource2.location
-  resource_group_name = data.azurerm_resource_group.resource2.name
+  location            = azurerm_resource_group.resource2.location
+  resource_group_name = azurerm_resource_group.resource2.name
   sku = "Standard"
 
   
