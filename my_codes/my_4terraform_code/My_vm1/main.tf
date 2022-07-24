@@ -49,9 +49,37 @@ resource "azurerm_network_interface" "networkint1" {
     name = "testipconfig4"
     subnet_id = azurerm_subnet.subnet1.id
     private_ip_address_allocation = "Dynamic"
+    public_ip_address_id = azurerm_public_ip.azpip1.id
   }
 }
-resource "azurerm_virtual_machine" "vir1" {
+
+resource "azurerm_network_security_group" "az_network_security" {
+  name                = "azure-security-group1"
+  location            = azurerm_resource_group.resource2.location
+  resource_group_name = azurerm_resource_group.resource2.name
+
+  security_rule {
+    name                       = "ssh"
+    priority                   = 100
+    direction                  = "Inbound"
+    access                     = "Allow"
+    protocol                   = "Tcp"
+    source_port_range          = "*"
+    destination_port_ranges = ["22", "80"]
+    source_address_prefix      = "*"
+    destination_address_prefix = "*"
+  }
+
+  tags = {
+    environment = "Production"
+  }
+}
+
+  resource "azurerm_network_interface_security_group_association" "az_association" {
+    network_interface_id      = azurerm_network_interface.networkint1.id
+    network_security_group_id = azurerm_network_security_group.az_network_security.id
+}
+  resource "azurerm_virtual_machine" "vir1" {
   name = var.vm4_name
   resource_group_name = azurerm_resource_group.resource2.name
   location = azurerm_resource_group.resource2.location
@@ -60,7 +88,7 @@ resource "azurerm_virtual_machine" "vir1" {
 
   
 
-storage_image_reference {
+  storage_image_reference {
     publisher = "Canonical"
     offer     = "UbuntuServer"
     sku       = "16.04-LTS"
@@ -84,6 +112,35 @@ storage_image_reference {
     environment = "vir.machine"
   }
 
+  connection {
+    type     = "ssh"
+    user     = var.username
+    password = var.password
+    host     = azurerm_public_ip.azpip1.ip_address
+  }
+
+
+
+  provisioner "file" {
+    source      = "/var/www/html/subha"
+    destination = "/tmp/"
+  }
+
+  provisioner "remote-exec" {
+    inline = [
+      "sudo apt update",
+      "sudo apt install apache2 -y",
+      "sudo cp /tmp/index.html /var/www/html/subha",
+      "sudo systemctl restart apache2",
+      "sudo systemctl status apache2",
+    ]
+  }
+
+  
+
 }
 
+output "vm_public_ip" {
+  value = azurerm_public_ip.azpip1.ip_address
+}
 

@@ -20,14 +20,19 @@ print("hello "+"A"+" "+"B")
 
 A = "1,2,23,4,5"
 x = A.rsplit(",")
+Y = tuple(A)
 print(x)
+print(Y)
 
 A = 'abc.java'
 x = A.lstrip(("abc"))
 print(x)
 
+A = "subhashree.sahoo"
+X = A.rstrip(("sahoo"))
+
 A = [1,2,3,4]
-print(A[0],A[-1])
+print(A[0],A[3])
 
 examdate = ("2o.5.2022")
 print("Exam date will start from:"+examdate)
@@ -39,18 +44,29 @@ n4 = int(5)
 n6 = (n1+n2+n4)
 print(n6)
 
+A = 5
+X = A+A*A+A*A*A
+print(X)
+
+A = 5
+X = A*A*A*A
+print(X)
+
 import calendar
-cal = (2022,5)
-print("here is the calendar:")
-print(cal)
+cal = ("2022,5")
+print("here is the calendar:"+(cal))
+
 
 from datetime import date
 A = date(2022,3,7)
-B = date(2023,5,2)
+B = date(2022,3,10)
 delta = B - A 
-print(delta.days)
+print(delta)
 
 import getpass
 print(getpass.getuser())
 
 print("Helloweveryone")
+
+import datetime
+print(datetime.datetime.now());
