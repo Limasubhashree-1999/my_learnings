@@ -95,7 +95,7 @@ resource "azurerm_network_security_group" "az_network_security" {
     version   = "latest"
   }
   storage_os_disk {
-    name              = "myosdisk1"
+    name              = "myosdisk3"
     caching           = "ReadWrite"
     create_option     = "FromImage"
     managed_disk_type = "Standard_LRS"
@@ -112,35 +112,46 @@ resource "azurerm_network_security_group" "az_network_security" {
     environment = "vir.machine"
   }
 
-  connection {
+  # connection {
+  #   type     = "ssh"
+  #   user     = var.username
+  #   password = var.password
+  #   host     = azurerm_public_ip.azpip1.ip_address
+  # }
+
+  provisioner "file" {
+    source      = "subha"
+    destination = "/tmp/index.html"
+
+    connection {
+    type     = "ssh"
+    user     = var.username
+    password = var.password
+    host     = azurerm_public_ip.azpip1.ip_address
+   }
+
+  }
+
+  provisioner "remote-exec" {
+    inline = [
+      "ls -lrth /tmp/",
+      "sudo apt update",
+      "sudo apt install apache2 -y",
+      "sudo cp /tmp/index.html /var/www/html/index.html",
+      "sudo systemctl restart apache2",
+      "sudo systemctl status apache2",
+    ]
+    connection {
     type     = "ssh"
     user     = var.username
     password = var.password
     host     = azurerm_public_ip.azpip1.ip_address
   }
-
-
-
-  provisioner "file" {
-    source      = "/var/www/html/subha"
-    destination = "/tmp/"
-  }
-
-  provisioner "remote-exec" {
-    inline = [
-      "sudo apt update",
-      "sudo apt install apache2 -y",
-      "sudo cp /tmp/index.html /var/www/html/subha",
-      "sudo systemctl restart apache2",
-      "sudo systemctl status apache2",
-    ]
   }
 
   
 
 }
 
-output "vm_public_ip" {
-  value = azurerm_public_ip.azpip1.ip_address
-}
+
 
