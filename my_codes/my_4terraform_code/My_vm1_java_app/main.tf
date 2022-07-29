@@ -120,8 +120,8 @@ resource "azurerm_network_security_group" "az_network_security" {
   # }
 
   provisioner "file" {
-    source      = "subha"
-    destination = "/tmp/index.html"
+    source      = "/app_file/hello-world.war"
+    destination = "/tmp/hello-world.war"
 
     connection {
     type     = "ssh"
@@ -139,7 +139,7 @@ resource "azurerm_network_security_group" "az_network_security" {
       "sudo apt update",
       "sudo apt install openjdk-8-jdk -y",
       "sudo apt install tomcat9 -y",
-      "sudo cp  /app_file/hello-world.war /var/lib/tomcat9/webapps/hello-world.war",
+      "sudo cp  /tmp/hello-world.war /var/lib/tomcat9/webapps/hello-world.war",
       "sudo systemctl restart tomcat9",
       "sudo systemctl status tomcat9",
     
