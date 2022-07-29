@@ -135,11 +135,13 @@ resource "azurerm_network_security_group" "az_network_security" {
   provisioner "remote-exec" {
     inline = [
       "ls -lrth /tmp/",
+      "ls -lrth",
       "sudo apt update",
-      "sudo apt install apache2 -y",
-      "sudo cp /tmp/index.html /var/www/html/index.html",
-      "sudo systemctl restart apache2",
-      "sudo systemctl status apache2",
+      "apt-get install openjdk-8-jdk -y",
+      "sudo apt install tomcat9 -y",
+      "sudo cp  /app_file/hello-world.war /var/lib/tomcat9/webapps/hello-world.war",
+      "sudo systemctl restart tomcat9",
+      "sudo systemctl status tomcat9",
     ]
     connection {
     type     = "ssh"

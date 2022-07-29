@@ -63,7 +63,7 @@ resource "azurerm_linux_virtual_machine" "vm1" {
   admin_username      = "adminuser"
   network_interface_ids = [
     element(azurerm_network_interface.az_nic.*.id, count.index)
-, ]
+ ]
 
 
  admin_ssh_key {
@@ -82,9 +82,33 @@ resource "azurerm_linux_virtual_machine" "vm1" {
     sku       = "19.04"
     version   = "latest"
   }
+
+  connection {
+    type     = "ssh"
+    user     = "adminuser"
+    password = "password"
+    host     = "azurerm_public_ip.az-pip[count.index]"
+  }
+
+
+
+  provisioner "file" {
+    source      = "/var/www/html/subha"
+    destination = "/tmp/index.html"
+  }
+
+  provisioner "remote-exec" {
+    inline = [
+      "sudo apt update",
+      "sudo apt install apache2 -y",
+      "sudo cp /tmp/index.html /var/www/html/subha",
+      "sudo systemctl restart apache2",
+      "sudo systemctl status apache2",
+    ]
+  }
+
+  
 }
-
-
 resource "azurerm_public_ip" "az-pip" {
   count               = 2
   name                = "azure-vm-nic-0${count.index}"
@@ -122,4 +146,7 @@ resource "azurerm_network_interface_security_group_association" "az_association"
     count = 2
     network_interface_id      = element(azurerm_network_interface.az_nic.*.id, count.index)
     network_security_group_id = azurerm_network_security_group.az_network_security.id
+}
+output "vm_public_ip" {
+  value = azurerm_public_ip.az-pip
 }

@@ -16,6 +16,7 @@ provider "azurerm" {
 data "azurerm_resource_group" "resource2" {
     name = var.rg4
     
+    
   
 }
 data "azurerm_virtual_network" "vnet1" {
@@ -82,5 +83,6 @@ storage_image_reference {
   }
 
 }
+
 
 
