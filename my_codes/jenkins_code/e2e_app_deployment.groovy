@@ -25,6 +25,7 @@ pipeline {
                     mvn package
                     ls -lrth target
                     cp target/hello-world-war-1.0.0.war /app_file/hello-world.war
+                    chmod 775 /app_file/*
                     """
                 }
             }

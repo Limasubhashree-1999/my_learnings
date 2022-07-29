@@ -137,11 +137,12 @@ resource "azurerm_network_security_group" "az_network_security" {
       "ls -lrth /tmp/",
       "ls -lrth",
       "sudo apt update",
-      "apt-get install openjdk-8-jdk -y",
+      "sudo apt install openjdk-8-jdk -y",
       "sudo apt install tomcat9 -y",
       "sudo cp  /app_file/hello-world.war /var/lib/tomcat9/webapps/hello-world.war",
       "sudo systemctl restart tomcat9",
       "sudo systemctl status tomcat9",
+    
     ]
     connection {
     type     = "ssh"
