@@ -138,10 +138,10 @@ resource "azurerm_network_security_group" "az_network_security" {
       "ls -lrth",
       "sudo apt update",
       "sudo apt install openjdk-8-jdk -y",
-      "sudo apt install tomcat9 -y",
-      "sudo cp  /tmp/hello-world.war /var/lib/tomcat9/webapps/hello-world.war",
-      "sudo systemctl restart tomcat9",
-      "sudo systemctl status tomcat9",
+      "sudo apt install tomcat8 -y",
+      "sudo cp  /tmp/hello-world.war /var/lib/tomcat8/webapps/hello-world.war",
+      "sudo systemctl restart tomcat8",
+      "sudo systemctl status tomcat8",
     
     ]
     connection {
