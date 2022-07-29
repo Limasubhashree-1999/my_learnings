@@ -24,7 +24,6 @@ pipeline {
                     ls -lrth
                     mvn package
                     ls -lrth target
-                    mkdir /app_files
                     cp target/hello-world-war-1.0.0.war /app_file/hello-world.war
                     """
                 }
