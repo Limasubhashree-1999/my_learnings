@@ -92,7 +92,7 @@ pipeline {
                      sh """
                         ls -lrth
                         cd my_learnings/my_codes/my_4terraform_code/My_vm1_java_aap
-                        /var/jenkins_home/workspace/app_deployement_pipeline/tf_binary/terraform init
+                        /var/jenkins_home/workspace/app_deployment_pipeline/tf_binary/terraform init
                         /var/jenkins_home/workspace/app_deployment_pipeline/tf_binary/terraform  plan 
                      """
                 }
