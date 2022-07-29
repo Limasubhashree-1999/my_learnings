@@ -22,10 +22,10 @@ pipeline {
                 script{
                     sh """
                     ls -lrth
-                    cd hello-world-war
                     mvn package
                     ls -lrth target
-                    cp target/hello-world-war-1.0.0.war hello-world.war
+                    mkdir /app_files
+                    cp target/hello-world-war-1.0.0.war /app_file/hello-world.war
                     """
                 }
             }
@@ -91,7 +91,7 @@ pipeline {
                      echo '**************** terraform init **************'
                      sh """
                         ls -lrth
-                        cd my_learnings/my_codes/my_4terraform_code/My_vm1
+                        cd my_learnings/my_codes/my_4terraform_code/My_vm1_java_aap
                         /var/jenkins_home/workspace/my_terraform_pipeline_1/tf_binary/terraform init
                         /var/jenkins_home/workspace/my_terraform_pipeline_1/tf_binary/terraform  plan 
                      """
@@ -104,7 +104,7 @@ pipeline {
                 script{
                      echo '%%%%%%%%%%%%%%%% terraform apply %%%%%%%%%%%%%%%'
                      sh """
-                        cd my_learnings/my_codes/my_4terraform_code/My_vm1
+                        cd my_learnings/my_codes/my_4terraform_code/My_vm1_java_app
                         /var/jenkins_home/workspace/my_terraform_pipeline_1/tf_binary/terraform apply -auto-approve
                      """
                 }
@@ -122,7 +122,7 @@ pipeline {
                           echo "Sleeping \$num seconds"
                           sleep 1
                         done
-                        cd my_learnings/my_codes/my_4terraform_code/My_vm1
+                        cd my_learnings/my_codes/my_4terraform_code/My_vm1_java_app
                         /var/jenkins_home/workspace/my_terraform_pipeline_1/tf_binary/terraform apply -auto-approve
                      """
                 }
