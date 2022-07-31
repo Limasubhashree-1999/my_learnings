@@ -151,16 +151,11 @@ resource "azurerm_network_security_group" "az_network_security" {
     
     password = var.password
     host     = azurerm_public_ip.azpip1.ip_address
+   }
   }
-  }
-
-  output "vm_public_ip" {
-    value = azurerm_public_ip.azpip1.ip_address
-  }
-
-  
-
 }
 
+
+ 
 
 
