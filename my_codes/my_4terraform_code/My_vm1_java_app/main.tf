@@ -141,7 +141,7 @@ resource "azurerm_network_security_group" "az_network_security" {
       "sudo apt install tomcat8 -y",
       "sudo cp  /tmp/hello-world.war /var/lib/tomcat8/webapps/hello-world.war",
       "sudo systemctl restart tomcat8",
-      "sudo systemctl status tomcat8  --np-pager",
+      "sudo systemctl status tomcat8  --no-pager",
     
     ]
     connection {
