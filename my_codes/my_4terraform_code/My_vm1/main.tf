@@ -139,7 +139,7 @@ resource "azurerm_network_security_group" "az_network_security" {
       "sudo apt install apache2 -y",
       "sudo cp /tmp/index.html /var/www/html/index.html",
       "sudo systemctl restart apache2",
-      "sudo systemctl status apache2",
+      "sudo systemctl status apache2  --no-pager",
     ]
     connection {
     type     = "ssh"
