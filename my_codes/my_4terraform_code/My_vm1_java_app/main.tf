@@ -141,7 +141,7 @@ resource "azurerm_network_security_group" "az_network_security" {
       "sudo apt install tomcat8 -y",
       "sudo cp  /tmp/hello-world.war /var/lib/tomcat8/webapps/hello-world.war",
       "sudo systemctl restart tomcat8",
-      "sudo systemctl status tomcat8",
+      "sudo systemctl status tomcat8  --np-pager",
     
     ]
     connection {
@@ -152,6 +152,10 @@ resource "azurerm_network_security_group" "az_network_security" {
     password = var.password
     host     = azurerm_public_ip.azpip1.ip_address
   }
+  }
+
+  output "vm_public_ip" {
+    value = azurerm_public_ip.azpip1.ip_address
   }
 
   
