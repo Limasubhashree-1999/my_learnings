@@ -28,7 +28,7 @@ data "azurerm_subnet" "subnet1" {
     resource_group_name = data.azurerm_resource_group.resource2.name
     virtual_network_name = data.azurerm_virtual_network.vnet1.name
 }
-resource "azurerm_public_ip" "azpip2" {
+resource "azurerm_public_ip" "azpip3" {
   name                    = var.vm4_pip
   location                = data.azurerm_resource_group.resource2.location
   resource_group_name     = data.azurerm_resource_group.resource2.name
@@ -39,7 +39,7 @@ resource "azurerm_public_ip" "azpip2" {
     environment = "vm"
   }
 }
-resource "azurerm_network_interface" "networkint2" {
+resource "azurerm_network_interface" "networkint3" {
   name = var.vm4_nic
   location = data.azurerm_resource_group.resource2.location
   resource_group_name = data.azurerm_resource_group.resource2.name
@@ -53,7 +53,7 @@ resource "azurerm_virtual_machine" "vir2" {
   name = var.vm4_name
   resource_group_name = data.azurerm_resource_group.resource2.name
   location = data.azurerm_resource_group.resource2.location
-  network_interface_ids = [azurerm_network_interface.networkint2.id]
+  network_interface_ids = [azurerm_network_interface.networkint3.id]
   vm_size = var.vm4_size
 
   
