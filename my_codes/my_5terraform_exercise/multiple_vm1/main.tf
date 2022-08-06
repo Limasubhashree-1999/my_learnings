@@ -54,6 +54,42 @@ resource "azurerm_ssh_public_key" "az_pub_key" {
   location            = azurerm_resource_group.az_resources.location
   public_key          = file("~/.ssh/id_rsa.pub")
 }
+resource "azurerm_public_ip" "az_pip" {
+  count               = 2
+  name                = "azure-vm-nic-0${count.index}"
+  resource_group_name = azurerm_resource_group.az_resources.name
+  location            = azurerm_resource_group.az_resources.location
+  allocation_method   = "Dynamic"
+
+  tags = {
+    environment = "Production"
+  }
+}
+
+resource "azurerm_network_security_group" "az_network_security" {
+  name                = "azure-security-group1"
+  location            = azurerm_resource_group.az_resources.location
+  resource_group_name = azurerm_resource_group.az_resources.name
+
+  security_rule {
+    name                       = "ssh"
+    priority                   = 100
+    direction                  = "Inbound"
+    access                     = "Allow"
+    protocol                   = "Tcp"
+    source_port_range          = "*"
+    destination_port_range     = ["22","80"]
+    source_address_prefix      = "*"
+    destination_address_prefix = "*"
+  }
+
+  tags = {
+    environment = "Production"
+  }
+}
+
+
+
 resource "azurerm_linux_virtual_machine" "vm1" {
   name                = "azure-VM-${count.index}"
   count               = 2
@@ -87,7 +123,7 @@ resource "azurerm_linux_virtual_machine" "vm1" {
     type     = "ssh"
     user     = "adminuser"
     password = "password"
-    host     = "azurerm_public_ip.az-pip[count.index]"
+    host     = [element(azurerm_public_ip.az_pip.*.ip_address, count.index)]
   }
 
 
@@ -95,6 +131,14 @@ resource "azurerm_linux_virtual_machine" "vm1" {
   provisioner "file" {
     source      = "/var/www/html/subha"
     destination = "/tmp/index.html"
+
+  connection {
+    type     = "ssh"
+    user     = "adminuser"
+    password = "password"
+    host     = [element(azurerm_public_ip.az_pip.*.ip_address, count.index)]
+
+   }
   }
 
   provisioner "remote-exec" {
@@ -105,42 +149,16 @@ resource "azurerm_linux_virtual_machine" "vm1" {
       "sudo systemctl restart apache2",
       "sudo systemctl status apache2",
     ]
+  connection {
+    type     = "ssh"
+    user     = username
+
+    
+    password = password
+    host     = azurerm_public_ip.az-pip.ip_address
   }
 
-  
-}
-resource "azurerm_public_ip" "az-pip" {
-  count               = 2
-  name                = "azure-vm-nic-0${count.index}"
-  resource_group_name = azurerm_resource_group.az_resources.name
-  location            = azurerm_resource_group.az_resources.location
-  allocation_method   = "Dynamic"
-
-  tags = {
-    environment = "Production"
-  }
-}
-
-resource "azurerm_network_security_group" "az_network_security" {
-  name                = "azure-security-group1"
-  location            = azurerm_resource_group.az_resources.location
-  resource_group_name = azurerm_resource_group.az_resources.name
-
-  security_rule {
-    name                       = "ssh"
-    priority                   = 100
-    direction                  = "Inbound"
-    access                     = "Allow"
-    protocol                   = "Tcp"
-    source_port_range          = "*"
-    destination_port_range     = "22"
-    source_address_prefix      = "*"
-    destination_address_prefix = "*"
-  }
-
-  tags = {
-    environment = "Production"
-  }
+ }
 }
 resource "azurerm_network_interface_security_group_association" "az_association" {
     count = 2
