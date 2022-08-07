@@ -78,7 +78,7 @@ resource "azurerm_network_security_group" "az_network_security" {
     access                     = "Allow"
     protocol                   = "Tcp"
     source_port_range          = "*"
-    destination_port_range     = ["22","80"]
+    destination_port_ranges     = ["22","80"]
     source_address_prefix      = "*"
     destination_address_prefix = "*"
   }
@@ -119,15 +119,6 @@ resource "azurerm_linux_virtual_machine" "vm1" {
     version   = "latest"
   }
 
-  connection {
-    type     = "ssh"
-    user     = "adminuser"
-    password = "password"
-    host     = [element(azurerm_public_ip.az_pip.*.ip_address, count.index)]
-  }
-
-
-
   provisioner "file" {
     source      = "/var/www/html/subha"
     destination = "/tmp/index.html"
@@ -136,7 +127,7 @@ resource "azurerm_linux_virtual_machine" "vm1" {
     type     = "ssh"
     user     = "adminuser"
     password = "password"
-    host     = [element(azurerm_public_ip.az_pip.*.ip_address, count.index)]
+    host     = azurerm_public_ip.az_pip[count.index]
 
    }
   }
@@ -151,11 +142,11 @@ resource "azurerm_linux_virtual_machine" "vm1" {
     ]
   connection {
     type     = "ssh"
-    user     = username
+    user     = "username"
 
     
-    password = password
-    host     = azurerm_public_ip.az-pip.ip_address
+    password = "password123"
+    host     = azurerm_public_ip.az_pip[count.index]
   }
 
  }
@@ -166,5 +157,5 @@ resource "azurerm_network_interface_security_group_association" "az_association"
     network_security_group_id = azurerm_network_security_group.az_network_security.id
 }
 output "vm_public_ip" {
-  value = azurerm_public_ip.az-pip
+  value = azurerm_public_ip.az_pip
 }
