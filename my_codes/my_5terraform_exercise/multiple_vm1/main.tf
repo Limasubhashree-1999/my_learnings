@@ -157,5 +157,10 @@ resource "azurerm_network_interface_security_group_association" "az_association"
     network_security_group_id = azurerm_network_security_group.az_network_security.id
 }
 output "vm_public_ip" {
+<<<<<<< HEAD
   value = azurerm_public_ip.az_pip
 }
+=======
+  value = azurerm_public_ip.az-pip
+}
+>>>>>>> cac7cf7903e2187e3cbc2a677aaf33a427f5038e
