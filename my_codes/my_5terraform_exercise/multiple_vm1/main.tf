@@ -40,11 +40,10 @@ resource "azurerm_network_interface" "az_nic" {
   resource_group_name = azurerm_resource_group.az_resources.name
 
   ip_configuration {
-    name                          = "internal"
+    name                          = "nic_config_host_${count.index}"
     subnet_id                     = azurerm_subnet.az_subnet.id
     private_ip_address_allocation = "Dynamic"
-    
-
+    public_ip_address_id = azurerm_public_ip.az_pip[count.index].id
   }
 }
 
@@ -59,7 +58,8 @@ resource "azurerm_public_ip" "az_pip" {
   name                = "azure-vm-nic-0${count.index}"
   resource_group_name = azurerm_resource_group.az_resources.name
   location            = azurerm_resource_group.az_resources.location
-  allocation_method   = "Dynamic"
+  allocation_method   = "Static"
+  sku                 = "Standard"
 
   tags = {
     environment = "Production"
@@ -90,7 +90,7 @@ resource "azurerm_network_security_group" "az_network_security" {
 
 
 
-resource "azurerm_linux_virtual_machine" "vm1" {
+resource "azurerm_linux_virtual_machine" "vms" {
   name                = "azure-VM-${count.index}"
   count               = 2
   resource_group_name = azurerm_resource_group.az_resources.name
@@ -114,53 +114,100 @@ resource "azurerm_linux_virtual_machine" "vm1" {
 
   source_image_reference {
     publisher = "Canonical"
-    offer     = "UbuntuServer"
-    sku       = "19.04"
+    offer     = "0001-com-ubuntu-server-focal"
+    sku       = "20_04-lts-gen2"
     version   = "latest"
   }
-
-  provisioner "file" {
-    source      = "/var/www/html/subha"
-    destination = "/tmp/index.html"
-
-  connection {
-    type     = "ssh"
-    user     = "adminuser"
-    password = "password"
-    host     = azurerm_public_ip.az_pip[count.index]
-
-   }
-  }
-
-  provisioner "remote-exec" {
-    inline = [
-      "sudo apt update",
-      "sudo apt install apache2 -y",
-      "sudo cp /tmp/index.html /var/www/html/subha",
-      "sudo systemctl restart apache2",
-      "sudo systemctl status apache2",
-    ]
-  connection {
-    type     = "ssh"
-    user     = "username"
-
-    
-    password = "password123"
-    host     = azurerm_public_ip.az_pip[count.index]
-  }
-
- }
 }
+
 resource "azurerm_network_interface_security_group_association" "az_association" {
     count = 2
     network_interface_id      = element(azurerm_network_interface.az_nic.*.id, count.index)
     network_security_group_id = azurerm_network_security_group.az_network_security.id
 }
+
+resource "null_resource" "apache2" {
+  count = 2
+  provisioner "remote-exec" {
+    inline = [
+      "sudo apt-get update && sudo apt-get -y upgrade",
+      "sudo apt install apache2 -y",
+      "sudo systemctl stop apache2",
+      "sudo chmod 777 /var/www/html/index.html",
+      "sudo echo `hostname` > /var/www/html/index.html",
+      "sudo echo `hostname -I` >> /var/www/html/index.html",
+      "sudo systemctl restart apache2",
+      "sudo systemctl status apache2 --no-pager",
+    ]
+  connection {
+        host = element(azurerm_linux_virtual_machine.vms.*.public_ip_address, count.index)
+        user = "adminuser"
+        type = "ssh"
+        private_key = file("~/.ssh/id_rsa")
+        timeout = "10m"
+        agent = false
+    }
+  }
+
+}
+
+
+resource "azurerm_public_ip" "lb_public_ip" {
+  name                = "lb_pip"
+  location            = azurerm_resource_group.az_resources.location
+  resource_group_name = azurerm_resource_group.az_resources.name
+  allocation_method   = "Static"
+  sku                 = "Standard"
+}
+
+resource "azurerm_lb" "azure_lb" {
+  name                = "azure_test_lb"
+  location            = azurerm_resource_group.az_resources.location
+  resource_group_name = azurerm_resource_group.az_resources.name
+  sku = "Standard"  
+  frontend_ip_configuration {
+    name                 = "lb_frontend_pip"
+    public_ip_address_id = azurerm_public_ip.lb_public_ip.id
+  }
+}
+
+resource "azurerm_lb_backend_address_pool" "az_backend_pool" {
+  loadbalancer_id = azurerm_lb.azure_lb.id
+  name            = "azure_lb_pool"
+}
+
+resource "azurerm_lb_probe" "az_lb_probe" {
+  loadbalancer_id     = azurerm_lb.azure_lb.id
+  name                = "classiclb"
+  port                = 80
+  interval_in_seconds = 10
+  number_of_probes    = 3
+  protocol            = "Tcp"
+}
+
+resource "azurerm_lb_rule" "az_lb_rule" {
+  loadbalancer_id                = azurerm_lb.azure_lb.id
+  name                           = "classiclb"
+  protocol                       = "Tcp"
+  frontend_port                  = 80
+  backend_port                   = 80
+  frontend_ip_configuration_name = "lb_frontend_pip"
+  probe_id                       = azurerm_lb_probe.az_lb_probe.id
+  backend_address_pool_ids       = [azurerm_lb_backend_address_pool.az_backend_pool.id]
+}
+
+
+resource "azurerm_network_interface_backend_address_pool_association" "az_lb_association" {
+  count = 2
+  network_interface_id    = element(azurerm_network_interface.az_nic.*.id, count.index)
+  ip_configuration_name   = "nic_config_host_${count.index}"
+  backend_address_pool_id = azurerm_lb_backend_address_pool.az_backend_pool.id
+}
+
 output "vm_public_ip" {
-<<<<<<< HEAD
-  value = azurerm_public_ip.az_pip
+  value = azurerm_public_ip.az_pip.*.ip_address
 }
-=======
-  value = azurerm_public_ip.az-pip
+
+output "loabbalancer_frontend_public_ip" {
+  value = azurerm_public_ip.lb_public_ip.ip_address
 }
->>>>>>> cac7cf7903e2187e3cbc2a677aaf33a427f5038e
